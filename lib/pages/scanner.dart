@@ -81,7 +81,7 @@ class _NfcScannerState extends State<NfcScanner> {
       tag_id = tag.data["nfca"]["identifier"];
     });
 
-    sleep(Duration(seconds: 2));
+    sleep(Duration(milliseconds: 500));
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => Shop()),
