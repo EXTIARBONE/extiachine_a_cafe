@@ -31,6 +31,7 @@ class _NfcScannerState extends State<NfcScanner> {
   void initState() {
     super.initState();
     _startScanning();
+    
   }
 
   @override

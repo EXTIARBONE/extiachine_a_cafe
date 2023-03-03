@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_extiachine_a_cafe/services/api_services.dart';
 import 'package:flutter_extiachine_a_cafe/widget/product.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Shop extends StatefulWidget {
   const Shop({super.key});
@@ -11,11 +13,39 @@ class Shop extends StatefulWidget {
   State<Shop> createState() => _ShopState();
 }
 
-
 class _ShopState extends State<Shop> {
+  late String name = '';
+  late String score = '';
+
+  Future<String?> _getPrefsName() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? name = prefs.getString('name');
+    return name;
+  }
+
+  Future<String?> _getPrefsScore() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? score = prefs.getString('score');
+    return score;
+  }
   @override
+  void initState() {
+    super.initState();
+    ApiServices.getUser();
+    _setPrefs();
+  }
+
+  void _setPrefs() async {
+    String? prefsName = await _getPrefsName();
+    String? prefsScore = await _getPrefsScore();
+    setState(() {
+      name = prefsName ?? '';
+      score = prefsScore ?? '';
+    });
+    print("name : $name");
+  }
   Widget build(BuildContext context) {
-    return  Scaffold(
+    return Scaffold(
       backgroundColor: Color.fromARGB(255, 246, 200, 137),
       body: Center(
         child: Row(
@@ -24,13 +54,13 @@ class _ShopState extends State<Shop> {
             Column(
               children: [
                 const SizedBox(height: 70),
-                Text("EXTIARBONE",
-                style: GoogleFonts.montserrat(
+                Text(
+                  "EXTIARBONE",
+                  style: GoogleFonts.montserrat(
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                
                 const SizedBox(height: 30),
                 Container(
                   height: 120,
@@ -53,29 +83,27 @@ class _ShopState extends State<Shop> {
                     children: [
                       SizedBox(height: 15),
                       Text(
-                        "Bonjour Nicolas",
+                        "Bonjour $name",
                         style: GoogleFonts.montserrat(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white
-                        ),
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                       const SizedBox(height: 30),
                       Text(
-                        "Vous avez 2 points",
+                        "Vous avez $score points",
                         style: GoogleFonts.montserrat(
-                          fontSize: 17,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white
-                        ),
+                            fontSize: 17,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
                       ),
                     ],
                   ),
                 ),
-                
-                
-                const SizedBox(height: 20,),
-                 Expanded(
+                const SizedBox(
+                  height: 20,
+                ),
+                Expanded(
                   child: Center(
                     child: SingleChildScrollView(
                       child: Row(
@@ -88,13 +116,15 @@ class _ShopState extends State<Shop> {
                               Product(),
                             ],
                           ),
-                          const SizedBox(width: 15,),
+                          const SizedBox(
+                            width: 15,
+                          ),
                           Column(
                             children: const [
-                               Product(), 
-                               Product(),
-                               Product(),
-                               Product(),
+                              Product(),
+                              Product(),
+                              Product(),
+                              Product(),
                             ],
                           ),
                         ],
