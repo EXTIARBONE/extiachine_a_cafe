@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
@@ -16,11 +19,9 @@ class Pay extends StatefulWidget {
 class _PayState extends State<Pay> {
   late int score;
   late String userId = '';
+  bool _showDialog = false;
 
-
-
-
-void initState() {
+  void initState() {
     super.initState();
     _setPrefs();
   }
@@ -48,8 +49,36 @@ void initState() {
     print("score : $score");
   }
 
+  void checkPoints(String userId, int score) {
+    if (score <= 0) {
+      print("pas assez d'argent");
+    } else {
+      
+      ApiServices.subPoints(score, userId);
+      setState(() {
+        _showDialog = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (_showDialog) {
+      return AlertDialog(
+        title: Text("Votre achat a été effectué avec succès !"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _showDialog = false;
+              });
+              Navigator.of(context).pop();
+            },
+            child: Text("OK"),
+          ),
+        ],
+      );
+    }
     return Container(
       height: 200,
       child: Column(
@@ -86,7 +115,9 @@ void initState() {
           ElevatedButton(
             onPressed: () {
               print("OOooOo $score");
-              ApiServices.subPoints(score, userId);
+              //_showDialog = true;
+              checkPoints(userId, score);
+              //sleep(Duration(seconds: 2));
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Scanner()),
