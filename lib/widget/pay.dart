@@ -2,40 +2,91 @@ import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_extiachine_a_cafe/pages/scanner.dart';
+import 'package:flutter_extiachine_a_cafe/services/api_services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Pay extends StatelessWidget {
+class Pay extends StatefulWidget {
   const Pay({super.key});
 
   @override
+  State<Pay> createState() => _PayState();
+}
+
+class _PayState extends State<Pay> {
+  late int score;
+  late String userId = '';
+
+
+
+
+void initState() {
+    super.initState();
+    _setPrefs();
+  }
+
+  Future<String?> _getPrefsUserId() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId = prefs.getString('userId');
+    return userId;
+  }
+
+  Future<int?> _getPrefsScore() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    int? score = int.parse(prefs.getString('score')!);
+    return score;
+  }
+
+  void _setPrefs() async {
+    String? prefsId = await _getPrefsUserId();
+    int? prefsScore = await _getPrefsScore();
+    setState(() {
+      userId = prefsId ?? '';
+      int scoree = prefsScore!;
+      score = scoree - 10;
+    });
+    print("score : $score");
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return  Container(
+    return Container(
       height: 200,
-        child: Column(
-          
-          children: [
-            SizedBox(height: 10,),
-            Text("Achat:",
-            style: GoogleFonts.montserrat(
-              fontSize: 20,
-              fontWeight: FontWeight.bold
-            ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 10,
           ),
-          SizedBox(height: 10,),
-            Text("Kinder Bueno",
+          Text(
+            "Achat:",
             style: GoogleFonts.montserrat(
-              fontSize: 16,
-            ),
+                fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 10,),
-            Text("10 points",
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            "Kinder Bueno",
             style: GoogleFonts.montserrat(
               fontSize: 16,
             ),
           ),
-          SizedBox(height: 30,),
-            ElevatedButton(
+          SizedBox(
+            height: 10,
+          ),
+          Text(
+            "10 points",
+            style: GoogleFonts.montserrat(
+              fontSize: 16,
+            ),
+          ),
+          SizedBox(
+            height: 30,
+          ),
+          ElevatedButton(
             onPressed: () {
+              print("OOooOo $score");
+              ApiServices.subPoints(score, userId);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Scanner()),
@@ -53,9 +104,8 @@ class Pay extends StatelessWidget {
               ),
             ),
           ),
-          ],
-        ),
-      
+        ],
+      ),
     );
   }
 }

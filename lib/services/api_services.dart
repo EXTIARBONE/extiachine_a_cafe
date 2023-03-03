@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class ApiServices {
   static const _urlApi = "https://extiarbone-back.azurewebsites.net";
 
@@ -22,7 +21,6 @@ class ApiServices {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('name', name);
       prefs.setString('score', score);
-      
     } else {
       throw Exception('Erreur de connexion');
     }
@@ -49,26 +47,32 @@ class ApiServices {
     }
   }
 
-
-static Future<void> getUser() async {
+  static Future<void> getUser() async {
     final http.Response response = await http.post(
-      (Uri.parse('$_urlApi/auth/subscribe')),
+      (Uri.parse('$_urlApi/nfc/getInfo')),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
-      body: jsonEncode(<String, String>{
-        'nfc': "83,44,239,72,113,0,1"
-      }),
+      body: jsonEncode(<String, String>{'nfc': "83,44,239,72,113,0,1"}),
     );
 
     if (response.statusCode == 200) {
-      print(response);
+      final jsonResponse = json.decode(response.body);
+      print(jsonResponse);
+
+      String name = jsonResponse['name'];
+      String score = jsonResponse['score'].toString();
+      String userId = jsonResponse['_id'].toString();
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('name', name);
+      prefs.setString('score', score);
+      prefs.setString('userId', userId);
+      print("name and score: $name $score");
     } else {
       throw Exception('Erreur de connexion');
     }
   }
 
- 
   static Future<List> getUserCount() async {
     final response = await http.get(
       Uri.parse("https://democracity-api.herokuapp.com/count"),
@@ -82,32 +86,23 @@ static Future<void> getUser() async {
     return userCount;
   }
 
-  static Future<bool> login(String username, String password) async {
-    final http.Response response = await http.post(
-      (Uri.parse('https://democracity-api.herokuapp.com/login')),
-      headers: <String, String>{
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-      body: jsonEncode(
-          <String, String>{'username': username, 'password': password}),
-    );
-    var data = response.body;
-    print(data);
+  static Future<bool> subPoints(int score, String userId) async {
+    print("Score: $score");
+    SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    return response.statusCode == 200;
-  }
-
-  static Future<bool> addFavorite(String username) async {
+    prefs.setString('score', score.toString());
     final http.Response response = await http.put(
-      (Uri.parse('https://democracity-api.herokuapp.com/favorite/$username')),
+      (Uri.parse('https://extiarbone-back.azurewebsites.net/user/nfc/6400fe950c5d30d8b1735768')),
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
+      body: jsonEncode(<String, int>{'score': score}),
     );
-    var data = response.body;
-    print(data);
-
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      print("nombre de points mis a jours");
+      return true;
+    } else {
+      throw Exception('Erreur de connexion');
+    }
   }
 }

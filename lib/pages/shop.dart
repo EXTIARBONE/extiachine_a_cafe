@@ -15,7 +15,7 @@ class Shop extends StatefulWidget {
 
 class _ShopState extends State<Shop> {
   late String name = '';
-  late String score = '';
+  late int score = 0;
 
   Future<String?> _getPrefsName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -23,11 +23,13 @@ class _ShopState extends State<Shop> {
     return name;
   }
 
-  Future<String?> _getPrefsScore() async {
+  Future<int?> _getPrefsScore() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? score = prefs.getString('score');
+    int? score = int.parse(prefs.getString('score')!);
     return score;
   }
+
+  
   @override
   void initState() {
     super.initState();
@@ -37,20 +39,20 @@ class _ShopState extends State<Shop> {
 
   void _setPrefs() async {
     String? prefsName = await _getPrefsName();
-    String? prefsScore = await _getPrefsScore();
+    int? prefsScore = await _getPrefsScore();
     setState(() {
       name = prefsName ?? '';
-      score = prefsScore ?? '';
+      score = prefsScore!;
     });
     print("name : $name");
   }
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 246, 200, 137),
+      backgroundColor: Color.fromARGB(255, 253, 212, 154),
       body: Center(
         child: Row(
           children: [
-            const SizedBox(width: 25),
+            const SizedBox(width: 30),
             Column(
               children: [
                 const SizedBox(height: 70),
@@ -82,14 +84,21 @@ class _ShopState extends State<Shop> {
                   child: Column(
                     children: [
                       SizedBox(height: 15),
-                      Text(
-                        "Bonjour $name",
-                        style: GoogleFonts.montserrat(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Center(
+                            child: Text(
+                              "Bonjour $name",
+                              style: GoogleFonts.montserrat(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: 15),
                       Text(
                         "Vous avez $score points",
                         style: GoogleFonts.montserrat(

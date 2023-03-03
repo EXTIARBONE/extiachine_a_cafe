@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_extiachine_a_cafe/pages/shop.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:nfc_manager/nfc_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Scanner extends StatelessWidget {
   @override
@@ -34,11 +35,14 @@ class _NfcScannerState extends State<NfcScanner> {
     
   }
 
+  
+
   @override
   void dispose() {
     _stopScanning();
     super.dispose();
   }
+
 
   Future<void> _startScanning() async {
     if (!_isScanning) {
